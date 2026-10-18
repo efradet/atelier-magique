@@ -1,3 +1,4 @@
+import {JAPAN_TEMPLATES} from './japan.js';
 import {floodFill,pushHistory,undo,redo} from './core';
 import {drawSticker,drawEffects,drawTemplate} from './assets';
 export const WIDTH=960,HEIGHT=640;
@@ -28,5 +29,5 @@ export class DrawingEngine {
  resize(size){const s=this.stickers.find(s=>s.id===this.selected);if(s){s.size=size;s.x=Math.max(size/2,Math.min(WIDTH-size/2,s.x));s.y=Math.max(size/2,Math.min(HEIGHT-size/2,s.y));this.dirty=true;}}
  deleteSelected(){this.stickers=this.stickers.filter(s=>s.id!==this.selected);this.selected=null;this.commit();}
  clearEffects(){this.effects=[];this.commit();}
- fresh(template){this.hasArt=!!template;this.stickers=[];this.effects=[];this.selected=null;this.title=template?({cat:'Mon chat à colorier',garden:'Mon jardin enchanté',rainbow:'Mon arc-en-ciel'})[template]:'Mon petit chef-d’œuvre';drawTemplate(this.b,template);this.commit();}
+ fresh(template){this.hasArt=!!template;this.stickers=[];this.effects=[];this.selected=null;this.title=template?(JAPAN_TEMPLATES.find(t=>t.id===template)?.title??({cat:'Mon chat à colorier',garden:'Mon jardin enchanté',rainbow:'Mon arc-en-ciel'})[template]):'Mon petit chef-d’œuvre';drawTemplate(this.b,template);this.commit();}
 }

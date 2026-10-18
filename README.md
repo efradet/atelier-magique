@@ -16,8 +16,9 @@ Ouvrir l’adresse locale affichée. `npm run build` produit le site statique da
 ## Fonctions
 
 - Pinceau, remplissage contigu, gomme, couleurs personnalisées et réglage de taille.
-- 16 stickers, déplaçables et redimensionnables, dont 6 illustrations SVG originales.
-- Trois coloriages : chat, jardin et arc-en-ciel.
+- 24 stickers, déplaçables et redimensionnables, dont 14 illustrations SVG originales.
+- Six coloriages : chat, jardin, arc-en-ciel, daims et temple de Nara, mont Fuji avec sakura, jardin japonais.
+- Catégorie Japon : daim de Nara, temple, torii, fleur de sakura, mont Fuji, lanterne, carpe koï et onigiri.
 - Paillettes, étoiles et cœurs animés ; pause de l’aperçu.
 - Annuler/refaire (25 étapes), Ctrl+Z et Ctrl+Maj+Z. Suppr retire le sticker sélectionné.
 - Dernier dessin conservé automatiquement dans le stockage local du navigateur. Pas de transfert des dessins vers un serveur. Les polices sont fournies localement.
@@ -38,6 +39,7 @@ Pour les tests navigateur, installer Chromium avec `npx playwright install chrom
 - `src/main.jsx` : interface et sauvegarde locale.
 - `src/engine.js` : interactions, historique et composition du dessin.
 - `src/assets.js` : stickers vectoriels, coloriages et effets animés.
+- `src/japan.js` : collection Japon, illustrations originales stylisées.
 - `src/core.js` : remplissage et validation des sauvegardes.
 - `src/export.js`, `src/gif.worker.js` : export et encodage GIF hors du fil de l’interface.
 
@@ -46,3 +48,5 @@ React, Vite, Lucide, gifenc et omggif conservent leurs licences respectives. Pol
 ## Aperçu
 
 ![L’Atelier magique](docs/apercu.png)
+
+Pour tester la collection Japon : `npm run test:japan` (serveur au port 5174, ou variable `TEST_BASE_URL`). Ce parcours vérifie les nouveaux coloriages, stickers, sauvegardes, le remplissage, l’export GIF et la mise en page mobile.

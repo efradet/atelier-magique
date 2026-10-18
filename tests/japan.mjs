@@ -1,0 +1,55 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {GifReader} from 'omggif';
+const output=process.env.TEST_OUTPUT_DIR||'.local/test-output';
+await fs.mkdir(output,{recursive:true});
+const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE,headless:true});
+try {
+  const page=await browser.newPage({viewport:{width:1440,height:1050},acceptDownloads:true});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(5000);
+  await page.goto(process.env.TEST_BASE_URL||'http://127.0.0.1:5174/',{timeout:30000});
+  await page.getByRole('button',{name:'Japon',exact:true}).click();
+  const names=['Daim de Nara','Temple japonais','Torii','Fleur de sakura','Mont Fuji','Lanterne','Carpe koï','Onigiri'];
+  for(const name of names)await page.getByRole('button',{name:'Ajouter '+name,exact:true}).click();
+  await page.waitForTimeout(500);
+  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('atelier-magique-dessin-v1')).stickers.length),8);
+  await page.reload();await page.getByRole('button',{name:'Japon',exact:true}).click();
+  await page.getByRole('tab',{name:'Coloriages',exact:true}).click();
+  const canvas=page.getByLabel('Feuille de dessin');
+  const hashes=[];
+  for(const name of ['Le mont Fuji et les sakura','Le jardin japonais','Les daims de Nara']){
+    await page.getByRole('button',{name:new RegExp(name)}).click();
+    await page.getByRole('button',{name:'Ouvrir le coloriage'}).click();
+    await page.waitForTimeout(100);
+    hashes.push(await canvas.evaluate(c=>c.toDataURL()));
+    await canvas.screenshot({path:path.join(output,name+'.png')});
+  }
+  assert.equal(new Set(hashes).size,3);
+  assert.equal(await page.getByLabel('Titre du dessin').inputValue(),'Les daims et le temple de Nara');
+  await page.getByRole('button',{name:'Remplir',exact:true}).click();
+  await page.getByRole('button',{name:'Pêche',exact:true}).click();
+  const b=await canvas.boundingBox();await page.mouse.click(b.x+230/960*b.width,b.y+315/640*b.height);
+  await page.waitForTimeout(100);
+  assert.deepEqual(await canvas.evaluate(c=>[...c.getContext('2d').getImageData(230,315,1,1).data]),[244,187,136,255]);
+  assert.deepEqual(await canvas.evaluate(c=>[...c.getContext('2d').getImageData(10,10,1,1).data]),[255,255,255,255]);
+  await page.getByRole('tab',{name:'Stickers',exact:true}).click();
+  await page.getByRole('button',{name:'Japon',exact:true}).click();
+  await page.getByRole('button',{name:'Ajouter Fleur de sakura',exact:true}).click();
+  await page.screenshot({path:path.join(output,'atelier-japon.png'),fullPage:true});
+  await page.getByRole('button',{name:/Sauvegarder/}).click();
+  const downloading=page.waitForEvent('download',{timeout:30000});
+  await page.getByRole('button',{name:'Télécharger mon dessin',exact:true}).click();
+  const file=await downloading;const dest=path.join(output,'nara.gif');await file.saveAs(dest);
+  const gif=new GifReader(await fs.readFile(dest));assert.equal(gif.numFrames(),24);
+  const rgba=Buffer.alloc(gif.width*gif.height*4);gif.decodeAndBlitFrameRGBA(0,rgba);
+  assert.ok(rgba.some((v,i)=>i%4!==3&&v<180));
+  await page.getByRole('button',{name:'Fermer',exact:true}).click();
+  await page.setViewportSize({width:390,height:844});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await page.getByRole('tab',{name:'Coloriages',exact:true}).click();
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  assert.deepEqual(errors,[]);
+  console.log('PASS: 8 Japan stickers, persistence, 3 distinct coloring pages, bounded deer fill, GIF export, mobile layout');
+}finally{await browser.close();}
