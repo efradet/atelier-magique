@@ -1,0 +1,2 @@
+import {GIFEncoder,quantize,applyPalette} from 'gifenc';
+self.onmessage=({data:{frames,width,height}})=>{try{const gif=GIFEncoder();frames.forEach((buffer,i)=>{const rgba=new Uint8Array(buffer);const palette=quantize(rgba,256);const index=applyPalette(rgba,palette);gif.writeFrame(index,width,height,{palette,delay:100,repeat:0});self.postMessage({progress:Math.round((i+1)/frames.length*100)});});gif.finish();const bytes=gif.bytes();self.postMessage({bytes:bytes.buffer},[bytes.buffer]);}catch(error){self.postMessage({error:error.message});}};
