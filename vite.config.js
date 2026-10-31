@@ -1,3 +1,5 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-export default defineConfig({ plugins: [react()], optimizeDeps: { include: ['gifenc'] } });
+
+// base relative: the site works locally and on GitHub Pages (/atelier-magique/).
+export default defineConfig({ base: './', plugins: [react()], optimizeDeps: { include: ['gifenc'] } });

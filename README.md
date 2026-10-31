@@ -50,3 +50,7 @@ React, Vite, Lucide, gifenc et omggif conservent leurs licences respectives. Pol
 ![L’Atelier magique](docs/apercu.png)
 
 Pour tester la collection Japon : `npm run test:japan` (serveur au port 5174, ou variable `TEST_BASE_URL`). Ce parcours vérifie les nouveaux coloriages, stickers, sauvegardes, le remplissage, l’export GIF et la mise en page mobile.
+
+## Publier sur GitHub Pages
+
+`.github/workflows/pages.yml` installe les dépendances, lance `npm test`, construit le site et publie le dossier `dist` à chaque envoi sur `main`. Une seule fois dans le dépôt : **Settings > Pages > Source : GitHub Actions**. Le jeu est ensuite disponible sur `https://efradet.github.io/atelier-magique/`. Le site utilise des chemins relatifs (`base: './'`), il fonctionne donc aussi en local.
